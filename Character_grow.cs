@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System.IO;
 public class Character_grow : MonoBehaviour
 {
 
@@ -15,6 +15,8 @@ public class Character_grow : MonoBehaviour
     public Vector2 f;
     public Vector2 b;
     public Vector2 s;
+    private string check;
+    private bool onetime = false;
 
     // Start is called before the first frame update
     void Start()
@@ -27,6 +29,12 @@ public class Character_grow : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
+        string json = File.ReadAllText(Application.dataPath + "/Script/api.json");
+        Debug.Log(json);
+        apiData loadapiData = JsonUtility.FromJson<apiData>(json);
+        check = loadapiData.ignition_status;
+
         time = delay/transform.localScale.x;
         if (stop==0) {
             Invoke("stay", time);            
@@ -40,6 +48,8 @@ public class Character_grow : MonoBehaviour
             Invoke("small", time);
         }
         
+        
+
         if (Input.GetKeyUp("escape")) {
             b.x = f.x + bsize;
             b.y = f.x + bsize;
@@ -49,10 +59,19 @@ public class Character_grow : MonoBehaviour
         if (Input.GetKeyUp("space")) {
             stop = 1;
         }
-     
+
         if (Input.GetKeyUp(KeyCode.Return)) {
             stop = 2;
         }
+
+        if (!onetime){
+            if (check == "ON") {
+            stop = 2;
+            onetime = true;
+            }
+        }
+
+
             
     }
     void big(){
@@ -76,5 +95,27 @@ public class Character_grow : MonoBehaviour
             s.y += Time.deltaTime * speed * -1;
             transform.localScale = s;
         }
+    }
+    private class apiData{
+        public int fuel_value;
+        public int fuel_distance_to_empty;
+        public string location_longitude;
+        public string location_latitude;
+        public int speed;
+        public string direction;
+        public string door_unspecified_front_door;
+        public string door_unspecified_front_role;
+        public string engine_status;
+        public int engine_duration;
+        public bool tire_warning;
+        public string charge_value;
+        public string charge_start;
+        public string charge_end;
+        public string ignition_status;
+        public bool battery_value;
+        public int battery_distanceToEmpty;
+        public int mileage;
+        public int odometer;
+        public bool charge_plug_value;
     }
 }

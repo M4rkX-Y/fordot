@@ -1,50 +1,53 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using System.IO;
 
-public class Switch : MonoBehaviour
+public class Dialog : MonoBehaviour
 {
+    public Text textDisplay;
+    public string[] sentences;
+    private int index;
+    public float typingSpeed;
 
-    private string check;
+    public GameObject DialogUI;
+
     private bool onetime = false;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+    void Start(){
+        DialogUI.SetActive(false);
     }
 
-    // Update is called once per frame
+
     void Update()
     {
         string json = File.ReadAllText(Application.dataPath + "/Script/api.json");
-        Debug.Log(json);
+        //Debug.Log(json);
         apiData loadapiData = JsonUtility.FromJson<apiData>(json);
-        check = loadapiData.ignition_status;
-        Debug.Log(check);
-
-        if (Input.GetKeyUp("space"))
-        {
-            Water2D.Water2D_Spawner.instance.Spawn();
-        }
-
-        if (Input.GetKeyUp("escape"))
-        {
-            Water2D.Water2D_Spawner.instance._breakLoop = true;
-        }
-        
-        if (Input.GetKeyUp(KeyCode.Return)) {
-            Water2D.Water2D_Spawner.instance.Spawn();
-        }
-        
+        //Debug.Log(loadapiData.tire_warning);
         if (!onetime){
-            if (check == "ON") {
-            Water2D.Water2D_Spawner.instance.Spawn();
-            onetime = true;
+            if (loadapiData.tire_warning){
+                DialogUI.SetActive(true);
+                dialogDisplay();
+                onetime = true;
             }
         }
         
+    }
+    public void resume() {
+        //Debug.Log("success");
+        DialogUI.SetActive(false);
+    }
+    public void dialogDisplay(){
+        StartCoroutine(Type());
+    }
+
+    IEnumerator Type(){
+        foreach(char letter in sentences[index].ToCharArray()){
+            textDisplay.text += letter;
+            yield return new WaitForSeconds(typingSpeed);
+        }
     }
     private class apiData{
         public int fuel_value;
@@ -66,6 +69,7 @@ public class Switch : MonoBehaviour
         public int battery_distanceToEmpty;
         public int mileage;
         public int odometer;
-        public bool charge_plug_value;
+        public bool milecharge_plug_valueage;
+        
     }
 }

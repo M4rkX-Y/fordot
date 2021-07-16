@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
-public class Switch : MonoBehaviour
+public class changeEmotion : MonoBehaviour
 {
-
-    private string check;
-    private bool onetime = false;
+    public Animator animator;
 
     // Start is called before the first frame update
     void Start()
@@ -19,32 +17,14 @@ public class Switch : MonoBehaviour
     void Update()
     {
         string json = File.ReadAllText(Application.dataPath + "/Script/api.json");
-        Debug.Log(json);
+        //Debug.Log(json);
         apiData loadapiData = JsonUtility.FromJson<apiData>(json);
-        check = loadapiData.ignition_status;
-        Debug.Log(check);
-
-        if (Input.GetKeyUp("space"))
-        {
-            Water2D.Water2D_Spawner.instance.Spawn();
+        if (loadapiData.tire_warning){
+            animator.SetBool("Emotion", false);
         }
-
-        if (Input.GetKeyUp("escape"))
-        {
-            Water2D.Water2D_Spawner.instance._breakLoop = true;
+        else {
+            animator.SetBool("Emotion", true);
         }
-        
-        if (Input.GetKeyUp(KeyCode.Return)) {
-            Water2D.Water2D_Spawner.instance.Spawn();
-        }
-        
-        if (!onetime){
-            if (check == "ON") {
-            Water2D.Water2D_Spawner.instance.Spawn();
-            onetime = true;
-            }
-        }
-        
     }
     private class apiData{
         public int fuel_value;
@@ -66,6 +46,7 @@ public class Switch : MonoBehaviour
         public int battery_distanceToEmpty;
         public int mileage;
         public int odometer;
-        public bool charge_plug_value;
+        public bool milecharge_plug_valueage;
+        
     }
 }
